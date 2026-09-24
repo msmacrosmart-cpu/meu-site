@@ -1,4 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+/* ── Mobile detection (additive helper — no desktop changes) ── */
+const isMobile = () =>
+  typeof window !== 'undefined' && window.innerWidth <= 900;
+
+/* Looser line-height for the giant Barlow headlines on small screens */
+const getLh = (desktop: number, mobile: number): { lineHeight: number } =>
+  isMobile() ? { lineHeight: mobile } : { lineHeight: desktop };
 
 /* ── SVG Icons ── */
 const SearchIcon = () => (
@@ -128,6 +136,13 @@ const LogoMark = ({ size = 16, borderColor = '#555' }: { size?: number; borderCo
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('Digital');
+  const [, setVw] = useState(0);
+  useEffect(() => {
+    const onResize = () => setVw(window.innerWidth);
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   const services = [
     {
@@ -160,11 +175,11 @@ export default function App() {
           NAVIGATION
       ══════════════════════════════════════════ */}
       <header style={{ background: '#f0efeb', position: 'sticky', top: 0, zIndex: 100 }}>
-        <div style={{ maxWidth: '1160px', margin: '0 auto', padding: '0 28px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', height: '50px', gap: '36px' }}>
+        <div id="headerInner" style={{ maxWidth: '1160px', margin: '0 auto', padding: '0 28px' }}>
+          <div id="headerRow" style={{ display: 'flex', alignItems: 'center', height: '50px', gap: '36px' }}>
             <NeoVisionLogo dark={false} />
 
-            <nav style={{ display: 'flex', gap: '24px', flex: 1 }}>
+            <nav id="mainNav" style={{ display: 'flex', gap: '24px', flex: 1 }}>
               {['Home', 'About', 'Services', 'Contact'].map((link, i) => (
                 <a key={link} href="#" style={{
                   color: i === 0 ? '#111' : '#555',
@@ -177,7 +192,7 @@ export default function App() {
             </nav>
 
             {/* Search Bar */}
-            <div style={{
+            <div id="searchWrap" style={{
               display: 'flex', alignItems: 'center', gap: '8px',
               border: '1px solid #ccc', borderRadius: '18px',
               padding: '5px 14px', background: 'transparent',
@@ -200,10 +215,10 @@ export default function App() {
           height: '1px', background: 'rgba(185,180,170,0.55)'
         }} />
         <div style={{ maxWidth: '1160px', margin: '0 auto', padding: '0 28px' }}>
-          <div style={{ display: 'flex', minHeight: '430px', alignItems: 'stretch' }}>
+          <div id="heroBox" style={{ display: 'flex', minHeight: '430px', alignItems: 'stretch' }}>
 
             {/* ── Left ── */}
-            <div style={{ flex: '1', paddingTop: '50px', paddingBottom: '38px', position: 'relative', zIndex: 2 }}>
+            <div id="hero-left" style={{ flex: '1', paddingTop: '50px', paddingBottom: '38px', position: 'relative', zIndex: 2 }}>
               {/* Label row */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '7px' }}>
                 <span style={{ fontSize: '9px', color: '#b0a898', letterSpacing: '0.1em', fontWeight: 500 }}>DE</span>
@@ -215,7 +230,7 @@ export default function App() {
                 fontFamily: "'Barlow', 'Inter', sans-serif",
                 fontSize: 'clamp(46px, 6.2vw, 80px)',
                 fontWeight: 900,
-                lineHeight: 0.92,
+                ...getLh(0.92, 0.95),
                 color: '#0c0c0c',
                 textTransform: 'uppercase',
                 letterSpacing: '-0.025em',
@@ -226,7 +241,7 @@ export default function App() {
               </h1>
 
               {/* CTA Buttons */}
-              <div style={{ display: 'flex', gap: '10px', marginBottom: '42px' }}>
+              <div id="hero-ctas" style={{ display: 'flex', gap: '10px', marginBottom: '42px' }}>
                 <button style={{
                   background: '#1a1a1a', color: '#fff',
                   border: '1px solid #1a1a1a',
@@ -275,10 +290,12 @@ export default function App() {
             </div>
 
             {/* ── Right: Hero Image ── */}
-            <div style={{ position: 'relative', width: '470px', flexShrink: 0 }}>
+            <div id="hero-right" style={{ position: 'relative', width: '470px', flexShrink: 0 }}>
               <img
+                className="heroImg"
                 src="/images/hero-vr-woman.jpg"
                 alt="Woman with VR Headset"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 style={{
                   position: 'absolute',
                   top: 0, right: '-28px',
@@ -325,15 +342,15 @@ export default function App() {
       ══════════════════════════════════════════ */}
       <div style={{ background: '#0f0f0f', borderTop: '1px solid #1c1c1c', borderBottom: '1px solid #1c1c1c' }}>
         <div style={{ maxWidth: '1160px', margin: '0 auto', padding: '0 28px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', height: '52px', gap: '40px' }}>
-            <div style={{ width: '36px', height: '1px', background: '#2a2a2a', flexShrink: 0 }} />
+          <div id="brandsRow" style={{ display: 'flex', alignItems: 'center', height: '52px', gap: '40px' }}>
+            <div id="brandsLine" style={{ width: '36px', height: '1px', background: '#2a2a2a', flexShrink: 0 }} />
             {[1, 2].map(i => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
                 <LogoMark size={16} borderColor="#3a3a3a" />
                 <span style={{ fontSize: '11.5px', color: '#555', letterSpacing: '0.04em' }}>Logolpsum</span>
               </div>
             ))}
-            <div style={{ flex: 1 }} />
+            <div id="brandsSpacer" style={{ flex: 1 }} />
             {[3, 4, 5].map(i => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
                 <LogoMark size={16} borderColor="#3a3a3a" />
@@ -349,10 +366,10 @@ export default function App() {
       ══════════════════════════════════════════ */}
       <section style={{ background: '#0c0c0c', padding: '88px 0' }}>
         <div style={{ maxWidth: '1160px', margin: '0 auto', padding: '0 28px' }}>
-          <div style={{ display: 'flex', gap: '64px', alignItems: 'flex-start' }}>
+          <div id="aboutRow" style={{ display: 'flex', gap: '64px', alignItems: 'flex-start' }}>
 
             {/* Left — Helmet Image */}
-            <div style={{ flex: '0 0 360px' }}>
+            <div id="aboutImg" style={{ flex: '0 0 360px' }}>
               <div style={{
                 borderRadius: '6px',
                 overflow: 'hidden',
@@ -372,7 +389,7 @@ export default function App() {
             </div>
 
             {/* Right — Text */}
-            <div style={{ flex: 1, paddingTop: '8px' }}>
+            <div id="aboutText" style={{ flex: 1, paddingTop: '8px' }}>
               <div style={{ fontSize: '9px', color: '#555', letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: '14px' }}>
                 ABOUT US
               </div>
@@ -380,7 +397,8 @@ export default function App() {
               <h2 style={{
                 fontFamily: "'Barlow', Inter, sans-serif",
                 fontSize: 'clamp(38px, 4.5vw, 58px)',
-                fontWeight: 800, lineHeight: 0.95,
+                fontWeight: 800,
+                ...getLh(0.95, 1.0),
                 textTransform: 'uppercase',
                 color: '#f0f0f0',
                 letterSpacing: '-0.015em',
@@ -451,14 +469,14 @@ export default function App() {
       <section style={{ background: '#0a0a0a', padding: '80px 0' }}>
         <div style={{ maxWidth: '1160px', margin: '0 auto', padding: '0 28px' }}>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '36px' }}>
+          <div id="srvHead" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '36px' }}>
             <h2 style={{
               fontFamily: "'Barlow', Inter, sans-serif",
               fontSize: 'clamp(28px, 3.8vw, 48px)',
               fontWeight: 800, textTransform: 'uppercase',
               color: '#f0f0f0', letterSpacing: '-0.015em'
             }}>OUR SERVICE</h2>
-            <div style={{ display: 'flex', gap: '6px' }}>
+            <div id="srvArrows" style={{ display: 'flex', gap: '6px' }}>
               {[<ChevronLeft key="l" />, <ChevronRight key="r" />].map((icon, i) => (
                 <button key={i} style={{
                   width: '30px', height: '30px',
@@ -472,7 +490,7 @@ export default function App() {
           </div>
 
           {/* Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '14px' }}>
+          <div id="srvGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '14px' }}>
             {services.map((s, i) => (
               <div key={i} style={{
                 background: '#131313', border: '1px solid #1d1d1d',
@@ -516,12 +534,13 @@ export default function App() {
             fontSize: 'clamp(28px, 4vw, 52px)',
             fontWeight: 800, textTransform: 'uppercase',
             color: '#f0f0f0', letterSpacing: '-0.015em',
-            lineHeight: 1.0, marginBottom: '36px', maxWidth: '560px'
+            ...getLh(1.0, 1.06),
+            marginBottom: '36px', maxWidth: '560px'
           }}>
             LIMITLESS POSSIBILITIES<br />WITH NEOVISION
           </h2>
 
-          <div style={{ display: 'flex', gap: '24px', alignItems: 'stretch' }}>
+          <div id="limitRow" style={{ display: 'flex', gap: '24px', alignItems: 'stretch' }}>
 
             {/* Category list */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '8px', minWidth: '88px' }}>
@@ -536,7 +555,7 @@ export default function App() {
             </div>
 
             {/* Blog image */}
-            <div style={{
+            <div id="limitImg" style={{
               flex: '0 0 250px', borderRadius: '5px', overflow: 'hidden',
               background: '#181818', height: '240px'
             }}>
@@ -552,7 +571,7 @@ export default function App() {
             </div>
 
             {/* Blog card */}
-            <div style={{
+            <div id="limitCard" style={{
               flex: 1, background: '#131313', border: '1px solid #1d1d1d',
               borderRadius: '7px', padding: '22px',
               display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
@@ -584,10 +603,10 @@ export default function App() {
       ══════════════════════════════════════════ */}
       <section style={{ background: '#0a0a0a', padding: '0 0 80px' }}>
         <div style={{ maxWidth: '1160px', margin: '0 auto', padding: '0 28px' }}>
-          <div style={{ display: 'flex', gap: '60px', alignItems: 'flex-start' }}>
+          <div id="voicesRow" style={{ display: 'flex', gap: '60px', alignItems: 'flex-start' }}>
 
             {/* Left */}
-            <div style={{ flex: '0 0 300px' }}>
+            <div id="voicesLeft" style={{ flex: '0 0 300px' }}>
               <h2 style={{
                 fontFamily: "'Barlow', Inter, sans-serif",
                 fontSize: 'clamp(32px, 4vw, 52px)',
@@ -613,7 +632,7 @@ export default function App() {
               }} />
 
               {testimonials.map((t, i) => (
-                <div key={i} style={{
+                <div key={i} className="tCard" style={{
                   background: '#131313', border: '1px solid #1d1d1d',
                   borderRadius: '7px', padding: '16px 18px',
                   display: 'flex', gap: '14px', alignItems: 'center'
@@ -639,9 +658,9 @@ export default function App() {
       {/* ══════════════════════════════════════════
           DIVE INTO THE FUTURE — CTA
       ══════════════════════════════════════════ */}
-      <section style={{ background: '#0a0a0a', padding: '0 28px 80px' }}>
+      <section id="diveOuter" style={{ background: '#0a0a0a', padding: '0 28px 80px' }}>
         <div style={{ maxWidth: '1160px', margin: '0 auto' }}>
-          <div style={{
+          <div id="diveBox" style={{
             position: 'relative', borderRadius: '12px',
             overflow: 'hidden', minHeight: '270px'
           }}>
@@ -663,7 +682,7 @@ export default function App() {
             }} />
 
             {/* Content */}
-            <div style={{
+            <div id="diveInner" style={{
               position: 'relative',
               padding: '52px 48px',
               display: 'flex',
@@ -678,7 +697,8 @@ export default function App() {
                   fontSize: 'clamp(32px, 4vw, 56px)',
                   fontWeight: 900, textTransform: 'uppercase',
                   color: '#fff', letterSpacing: '-0.02em',
-                  lineHeight: 0.95, marginBottom: '22px'
+                  ...getLh(0.95, 1.0),
+                  marginBottom: '22px'
                 }}>
                   DIVE INTO THE<br />FUTURE
                 </h2>
@@ -697,7 +717,7 @@ export default function App() {
                 <p style={{ fontSize: '11.5px', color: 'rgba(220,220,220,0.85)', lineHeight: 1.68, marginBottom: '12px' }}>
                   Prepare to immerse yourself in the groundbreaking world of NeoVision. Explore the limitless possibilities of futuristic technology and virtual reality.
                 </p>
-                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                <div id="diveTags" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                   {['#Reality', '#VR', '#Innovation'].map(t => (
                     <span key={t} style={{ fontSize: '9.5px', color: '#666' }}>{t}</span>
                   ))}
@@ -715,7 +735,7 @@ export default function App() {
         <div style={{ maxWidth: '1160px', margin: '0 auto', padding: '0 28px' }}>
 
           {/* Grid */}
-          <div style={{
+          <div id="footerGrid" style={{
             display: 'grid',
             gridTemplateColumns: '1.3fr 0.8fr 0.9fr 1fr 1.4fr',
             gap: '36px', marginBottom: '44px'
